@@ -2,96 +2,81 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Rayyan Project | Intelligence Engine</title>
+    <title>Elite Challenge System</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;700&display=swap');
-        body { font-family: 'Tajawal', sans-serif; background: #050505; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .glass-card { 
-            background: rgba(255, 255, 255, 0.03); 
-            backdrop-filter: blur(20px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            padding: 50px; 
-            border-radius: 40px; 
-            width: 90%; max-width: 450px; 
-            text-align: center; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-        }
-        input { 
-            width: 100%; padding: 15px; margin: 25px 0; border-radius: 15px; 
-            border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); 
-            color: #00f2ff; text-align: center; font-size: 1.5rem; box-sizing: border-box;
-        }
-        button { 
-            background: #00f2ff; color: #000; border: none; padding: 18px 30px; 
-            border-radius: 15px; cursor: pointer; width: 100%; font-weight: bold; 
-            font-size: 1.1rem; transition: 0.3s; 
-        }
-        button:hover { background: #fff; transform: translateY(-3px); }
-        h1 { font-size: 2rem; margin-bottom: 30px; background: linear-gradient(to right, #00f2ff, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        :root { --glass: rgba(255, 255, 255, 0.08); --accent: #00f2ff; }
+        body { font-family: 'Segoe UI', sans-serif; background: #050505; color: #fff; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(255,255,255,0.1); padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 15px; margin: 15px 0; border-radius: 12px; border: none; background: rgba(0,0,0,0.3); color: white; text-align: center; box-sizing: border-box; }
+        button { background: var(--accent); border: none; padding: 15px 25px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="glass-card" id="app">
+<div class="card" id="app">
     <div id="start">
-        <h1>مشروع التحدي</h1>
-        <button onclick="next()">ابدأ المهمة</button>
+        <h1>نظام التحدي الذكي</h1>
+        <button onclick="start()">بدء الرحلة</button>
+        <p style="margin-top:20px; font-size:12px; cursor:pointer;" onclick="adminPanel()">لوحة التحكم (Admin)</p>
     </div>
 
-    <div id="quiz" class="hidden" style="display:none;">
-        <h2 id="qText"></h2>
+    <div id="quiz" class="hidden">
+        <h3 id="qText"></h3>
         <input type="text" id="ans" placeholder="الإجابة...">
         <button onclick="check()">تحقق</button>
     </div>
 
-    <div id="code" class="hidden" style="display:none;">
-        <h2 style="color:#00f2ff">فك الشفرة (6 أرقام)</h2>
+    <div id="code" class="hidden">
+        <h2 style="color:var(--accent)">فك الشفرة (6 أرقام)</h2>
         <p id="hint"></p>
         <input type="number" id="codeIn" placeholder="------">
-        <button onclick="verify()">تحقق</button>
+        <button onclick="verify()">إرسال</button>
     </div>
 </div>
 
 <script>
-    // أسئلة ذكاء (أضف هنا مئات الأسئلة)
-    const questions = [
-        {q: "ما هو الشيء الذي إذا غليته جمد؟", a: "البيض"},
-        {q: "عدد أرجل طائر الهدهد إذا كان لديك 3 طيور؟", a: "6"},
-        {q: "اسم التطبيق الذي سألتني عنه يوماً؟", a: "هاتف"}
-    ];
-    
-    // أرقامك الـ 60 (موزعة كـ 10 شفرات * 6 أرقام)
-    const codes = ["123456", "654321", "112233", "445566", "778899", "102030", "998877", "554433", "121212", "909090"];
-    const locs = ["البيارق", "الطلعة", "سواعد"];
+    // الإعدادات (هنا يمكنك تعديل المحتوى بسهولة)
+    let gameData = {
+        questions: [{q: "ما هو الشيء الذي إذا غليته جمد؟", a: "البيض"}, {q: "عاصمة السعودية؟", a: "الرياض"}],
+        codes: ["111111", "222222"],
+        locations: ["البيارق", "الطلعة", "سواعد"]
+    };
 
     let state = { qIdx: 0, sIdx: 0 };
 
-    function next() {
-        document.getElementById('start').style.display = 'none';
-        document.getElementById('quiz').style.display = 'block';
-        show();
-    }
-
-    function show() { document.getElementById('qText').innerText = questions[state.qIdx].q; }
+    function start() { document.getElementById('start').classList.add('hidden'); document.getElementById('quiz').classList.remove('hidden'); showQ(); }
+    
+    function showQ() { document.getElementById('qText').innerText = gameData.questions[state.qIdx].q; }
 
     function check() {
-        if(document.getElementById('ans').value === questions[state.qIdx].a) {
+        if(document.getElementById('ans').value === gameData.questions[state.qIdx].a) {
             state.qIdx++;
-            if(state.qIdx % 3 === 0) { // كل 3 أسئلة تطلع شفرة
-                document.getElementById('quiz').style.display = 'none';
-                document.getElementById('code').style.display = 'block';
-                document.getElementById('hint').innerText = "الشفرة مخفية في: " + locs[Math.floor(Math.random()*locs.length)];
-            } else { show(); }
-        } else { alert("حاول بذكاء أكبر!"); }
+            if(state.qIdx % 2 === 0) { // يطلب شفرة كل سؤالين
+                document.getElementById('quiz').classList.add('hidden');
+                document.getElementById('code').classList.remove('hidden');
+                document.getElementById('hint').innerText = "تلميح: الرقم في " + gameData.locations[Math.floor(Math.random()*3)];
+            } else { showQ(); }
+        } else { alert("إجابة خاطئة"); }
     }
 
     function verify() {
-        if(document.getElementById('codeIn').value === codes[state.sIdx]) {
+        if(document.getElementById('codeIn').value === gameData.codes[state.sIdx]) {
             state.sIdx++;
-            document.getElementById('code').style.display = 'none';
-            document.getElementById('quiz').style.display = 'block';
-            show();
+            alert("صحيح! تقدم للمرحلة التالية.");
+            document.getElementById('code').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+            showQ();
         } else { alert("رقم خاطئ!"); }
+    }
+
+    function adminPanel() {
+        let pass = prompt("أدخل كلمة مرور الإدارة:");
+        if(pass === "1234") {
+            let newQ = prompt("أدخل السؤال الجديد:");
+            if(newQ) gameData.questions.push({q: newQ, a: "الجواب"});
+            alert("تم التحديث!");
+        }
     }
 </script>
 </body>
