@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تحدي الألغاز الذكي</title>
+    <style>
+        :root { --accent: #00f2ff; --bg: #0a0a0a; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: #141414; padding: 40px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: 0.3s; }
+        input { width: 85%; padding: 15px; margin: 20px 0; border-radius: 12px; border: 1px solid #444; background: #1e1e1e; color: white; text-align: center; font-size: 1.2rem; }
+        button { background: var(--accent); color: #000; border: none; padding: 15px 30px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
+        button:hover { opacity: 0.8; transform: scale(1.02); }
+        .hidden { display: none; }
+        h1 { color: var(--accent); }
+    </style>
+</head>
+<body>
+
+<div class="card" id="app">
+    <div id="start">
+        <h1>مشروع الألغاز</h1>
+        <p>هل أنت مستعد لاختبار ذكائك؟</p>
+        <button onclick="nextStage()">بدء التحدي</button>
+    </div>
+
+    <div id="quiz" class="hidden">
+        <h3 id="qText"></h3>
+        <input type="text" id="ans" placeholder="الإجابة...">
+        <button onclick="check()">تأكيد</button>
+    </div>
+
+    <div id="code" class="hidden">
+        <h3>شفرة المرحلة</h3>
+        <p id="hint"></p>
+        <input type="number" id="codeIn" placeholder="------">
+        <button onclick="verify()">فك الشفرة</button>
+    </div>
+</div>
+
+<script>
+    const allQuestions = [{q:"عاصمة السعودية؟", a:"الرياض"}, {q:"لون السماء؟", a:"أزرق"}, {q:"كم عدد أركان الإسلام؟", a:"5"}];
+    const allCodes = ["111111", "222222", "333333", "444444", "555555", "666666"]; // أضف هنا أرقامك الـ 60
+    const locations = ["البيارق", "الطلعة", "سواعد", "المحمية", "الاستراحة"];
+    
+    let state = { qCount: 0, stage: 0 };
+
+    function nextStage() {
+        document.getElementById('start').classList.add('hidden');
+        document.getElementById('quiz').classList.remove('hidden');
+        document.getElementById('qText').innerText = allQuestions[state.qCount].q;
+    }
+
+    function check() {
+        if(document.getElementById('ans').value === allQuestions[state.qCount].a) {
+            state.qCount++;
+            if(state.qCount % 4 === 0) {
+                document.getElementById('quiz').classList.add('hidden');
+                document.getElementById('code').classList.remove('hidden');
+                document.getElementById('hint').innerText = "ابحث عن الرقم في: " + locations.sort(() => .5 - Math.random()).slice(0,2).join(" و ");
+            } else { document.getElementById('qText').innerText = allQuestions[state.qCount].q; }
+        } else { alert("حاول مجدداً!"); }
+    }
+
+    function verify() {
+        if(document.getElementById('codeIn').value === allCodes[state.stage]) {
+            alert("صحيح! استعد للمرحلة التالية.");
+            state.stage++;
+            document.getElementById('code').classList.add('hidden');
+            document.getElementById('quiz').classList.remove('hidden');
+        } else { alert("رقم خاطئ!"); }
+    }
+</script>
+</body>
+</html>
